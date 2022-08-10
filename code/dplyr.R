@@ -235,11 +235,216 @@ ggplot(gapminder_1952, aes(x = continent, y = gdpPercap)) +
   scale_y_log10() + 
   ggtitle("Comparing GDP per capita across continents")
 
+# --------------------------------------------------------- Data Manipulation with dplyr 1:4 ------------------------------------------------#
 
+# ---- Selecting verbs ---- #
 
+counties %>%
+  # Select the columns
+  select(state, county, population, poverty) 
 
+## Select and arrange (in descending order)
+counties_selected <- counties %>%
+  select(state, county, population, private_work, public_work, self_employed)
 
+counties_selected %>%
+  # Add a verb to sort in descending order of public_work
+  arrange(desc(public_work))
 
+## A complicated filter
+# Filter for Texas and more than 10000 people; sort in descending order of private_work
+counties_selected %>%
+  # Filter for Texas and more than 10000 people
+  filter(state == "Texas",
+         population > 10000) %>%
+  # Sort in descending order of private_work
+arrange(desc(private_work))
 
+## use the semicolon to select multiple columns without writing them out
+counties %>%
+  # Select state, county, population, and industry-related columns
+  select(state, county, population, professional:production) %>%
+  # Arrange service in descending order 
+  arrange(desc(service))
 
+# ---- Mutating verbs ---- #
 
+## Mutate examples
+counties_selected %>%
+  # Add a new column public_workers with the number of people employed in public work
+  mutate(public_workers = public_work * population / 100)
+
+counties_selected %>%
+  # Calculate proportion_women as the fraction of the population made up of women
+  mutate(proportion_women = women / population)
+
+# ---- Counting verbs ---- #
+
+## a regular count
+counties_selected %>%
+  count(region, sort = TRUE)
+
+## a count with a weight correction
+# Find number of counties per state, weighted by citizens, sorted in descending order
+counties_selected %>%
+  count(state, wt = citizens, sort = TRUE)
+
+## find the top/bottom observations in a dataset
+counties_selected %>%
+  # Group by region
+  group_by(region) %>%
+  # Find the greatest number of citizens who walk to work
+  top_n(1, walk)
+
+## find the top/bottom observations in a dataset for a calculated variables
+counties_selected %>%
+  group_by(region, state) %>%
+  # Calculate average income
+  summarize(average_income = mean(income)) %>%
+  # Find the highest income state in each region
+  top_n(1, average_income)
+
+# ---- Summarizing verbs ---- #
+
+counties_selected %>%
+  # Summarize to find minimum population, maximum unemployment, and average income
+  summarize(min_population = min(population),
+            max_unemployment = max(unemployment),
+            average_income = mean(income))
+
+counties_selected %>%
+  # Group by state 
+  group_by(state) %>%
+  # Find the total area and population
+  summarize(total_area = sum(land_area),
+            total_population = sum(population))
+
+counties_selected %>%
+  group_by(state) %>%
+  summarize(total_area = sum(land_area),
+            total_population = sum(population)) %>%
+  # Add a density column
+  mutate(density = total_population / total_area) %>%
+  # Sort by density in descending order
+  arrange(desc(density))
+
+counties_selected %>%
+  # Group and summarize to find the total population
+  group_by(region, state) %>%
+  summarize(total_pop = sum(population)) %>%
+  # Calculate the average_pop and median_pop columns 
+  summarize(average_pop = mean(total_pop),
+            median_pop = median(total_pop))
+
+# ---- Answer one question qith five verbs ---- #
+## aggregation: count(), group_by(), summarize(), ungroup(), and top_n()
+## In how many states do more people live in metro areas than non-metro areas?
+
+counties_selected %>%
+  # Find the total population for each combination of state and metro
+  group_by(state, metro) %>%
+  summarize(total_pop = sum(population)) %>%
+  # Extract the most populated row for each state
+  top_n(1, total_pop) %>%
+  # Count the states with more people in Metro or Nonmetro areas
+  ungroup() %>% 
+  count(metro)
+
+#ANS: 
+#1 Metro       44
+#2 Nonmetro     6
+
+# ---- Rename verbs ---- #
+
+counties %>%
+  # Count the number of counties in each state
+  count(state) %>%
+  # Rename the n column to num_counties
+  rename(num_counties = n)
+
+## You can also assign a new name when you use select and the equals sign
+counties %>%
+  # Select state, county, and poverty as poverty_rate
+  select(state, county, poverty_rate = poverty)
+
+# ---- Transmute verbs ---- #
+
+## The transmute verb allows you to control which variables you keep, which variables you calculate, and which variables you drop
+
+counties %>%
+  # Keep the state, county, and populations columns, and add a density column
+  transmute(state, county, population, density = population / land_area) %>%
+  # Filter for counties with a population greater than one million 
+  filter(population > 1000000) %>%
+  # Sort density in ascending order 
+  arrange(density)
+
+counties %>%
+  transmute(state, county, employment_rate = employed / population)
+
+# ---- Some more examples using the babynames dataset ---- #
+
+babynames %>%
+  # Filter for the year 1990
+  filter(year == 1990) %>%
+  # Sort the number column in descending order 
+    arrange(desc(number))
+
+babynames %>%
+  # Find the most common name in each year
+  group_by(year) %>%
+  top_n(1, number)
+
+selected_names <- babynames %>%
+  # Filter for the names Steven, Thomas, and Matthew 
+  filter(name %in% c("Steven", "Thomas", "Matthew"))
+
+# Calculate the fraction of people born each year with the same name
+babynames %>%
+  group_by(year) %>%
+  mutate(year_total = sum(number)) %>%
+  ungroup() %>%
+  mutate(fraction = number / year_total) %>%
+  # Find the year each name is most common
+  group_by(name) %>%
+  top_n(1, fraction)
+
+babynames %>%
+  # Add columns name_total and name_max for each name
+  group_by(name) %>%
+  mutate(name_total = sum(number),
+         name_max = max(number)) %>%
+  # Ungroup the table 
+  ungroup() %>%
+  # Add the fraction_max column containing the number by the name maximum 
+  mutate(fraction_max = number / name_max)
+
+names_filtered <- names_normalized %>%
+  # Filter for the names Steven, Thomas, and Matthew
+  filter(name %in% c("Steven", "Thomas", "Matthew"))
+
+# Visualize these names over time
+ggplot(names_filtered, aes(x = year, y = fraction_max, color = name)) +
+  geom_line()
+
+babynames_fraction %>%
+  # Arrange the data in order of name, then year 
+  arrange(name, year) %>%
+  # Group the data by name
+  group_by(name) %>%
+  # Add a ratio column that contains the ratio of fraction between each year 
+  mutate(ratio = fraction / lag(fraction))
+
+babynames_ratios_filtered <- babynames_fraction %>%
+                     arrange(name, year) %>%
+                     group_by(name) %>%
+                     mutate(ratio = fraction / lag(fraction)) %>%
+                     filter(fraction >= 0.00001)
+
+babynames_ratios_filtered %>%
+  # Extract the largest ratio from each name 
+  top_n(1, ratio) %>%
+  # Sort the ratio column in descending order 
+  arrange(desc(ratio)) %>%
+  # Filter for fractions greater than or equal to 0.001
+  filter(fraction >= 0.001)
