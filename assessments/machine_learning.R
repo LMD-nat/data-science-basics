@@ -101,3 +101,38 @@ print("The elbow occurs at 2.")
 ### Which of the following metrics would not be used when assessing the performance of a classification model?
 
 print("Median absolute error.")     
+     
+### Apply a Box-Cox Transformation to the variable x.
+     
+library(caret)
+preProcess(dist, method = "BoxCox") %>%
+  predict(newdata = dist) %>%
+  head()
+     
+     
+### The Boston dataset is loaded in this session as a data.frame. (this is where I went wrong)
+### Fit a linear model on the response variable value as a function of the explanatory variables status and age.
+     
+     
+model <- lm(value ~ status + age, data=Boston)
+
+coef(model)
+     
+ ### Remembering to scale the data, identify the principal components in the stocks data.
+     ### This is a trick question! Scale == T!
+     
+pca_stocks <- prcomp(stocks, scale = TRUE)
+
+summary(pca_stocks)
+    
+### Plot residuals
+     
+model <- lm(spend ~ ., data = weekly_spend)
+
+plot(model, which = 1)
+     
+### Again, plot residuals
+     
+model <- lm(y ~ x1, data = dist)
+     
+plot(model, which = 1)
