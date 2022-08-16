@@ -5,8 +5,6 @@ ggplot(metrics, aes(time_on_page, page_views, size = visits)) +
   
 ### Create a scatterplot of value against. Add linear regression line without confidence intervals to the plot.
 
-library(ggplot2)
-
 ggplot(valuation, aes(age, value)) + 
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)
@@ -40,14 +38,10 @@ ggplot(chinstrap, aes(x = `Culmen Length (mm)`, y = `Body Mass (g)`, color = Sex
   
 ### Create a boxplot of the number of breaks per wool type.
 
-library(ggplot2)
-
 ggplot(warpbreaks, aes(x = wool, y = breaks)) + 
   geom_boxplot()
   
 ### Create a density plot of the time taken (Time) by the students.
-
-library(ggplot2)
 
 ggplot(test_data, aes(Time)) + geom_density()
 
@@ -56,8 +50,6 @@ ggplot(test_data, aes(Time)) + geom_density()
 ### Use size to indicate the relative Generosity of countries.
 ### The data is contained in the happiness data frame.
 ### Complete the code to return the output
-
-library(ggplot2)
 
 ggplot(happiness, aes(`GDP per capita`, `Score`, size = `Generosity`)) + 
   geom_point()
@@ -75,8 +67,6 @@ ggplot(tools, aes(Week, Searches, group = Tool)) +
   theme(axis.text.x = element_text(angle = 20))
   
 ### Create a density plot of the ages (age) of all passengers aboard the titanic.
-
-library(ggplot2)
 
 ggplot(titanic, aes(x = age)) + geom_density()
 
@@ -96,4 +86,3 @@ ggplot(ethereum, aes(Date, Price)) +
 ggplot(experiment, aes(group)) + 
   geom_bar() + 
   coord_flip()
- 
