@@ -952,5 +952,473 @@ mdl_price_vs_both
 ggplot(auctions, aes(openbid, price, color = auction_type))+  geom_point()+  geom_smooth(method ="lm", se =FALSE)
 
 #### 2.3 Multiple Linear Regression
+
+# With taiwan_real_estate, draw a 3D scatter plot of no. of conv. stores, sqrt dist to MRT, and price
+scatter3D(taiwan_real_estate$n_convenience, sqrt(taiwan_real_estate$dist_to_mrt_m), taiwan_real_estate$price_twd_msq)
+# Using taiwan_real_estate, plot sqrt dist to MRT vs. no. of conv stores, colored by price
+  # Make it a scatter plot
+  # Use the continuous viridis plasma color scale
+
+ggplot(taiwan_real_estate, aes(n_convenience, sqrt(dist_to_mrt_m), color = price_twd_msq))+  geom_point()+  scale_color_viridis_c(option ="plasma")
+
+#+  geom_point(data = prediction_data, shape =15, size =3)
+
+
+
+# Fit a linear regression of price vs. no. of conv. stores and sqrt dist. to nearest MRT, no interaction
+mdl_price_vs_conv_dist <- lm(formula = price_twd_msq ~ n_convenience + sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+
+
+# See the result
+mdl_price_vs_conv_dist
+
+
+
+# From previous step 
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience + sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+# Create expanded grid of explanatory variables with no. of conv. stores and  dist. to nearest MRT
+explanatory_data <- expand_grid(
+  n_convenience = 0:10,
+  dist_to_mrt_m = seq(0, 80, 10) ^ 2
+)
+
+# Add predictions using mdl_price_vs_conv_dist and explanatory_data
+prediction_data <- explanatory_data %>% 
+  mutate(
+    price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data)
+  )
+
+# See the result
+prediction_data
+
+
+
+# From previous steps
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience + sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+explanatory_data <- expand_grid(n_convenience = 0:10, dist_to_mrt_m = seq(0, 80, 10) ^ 2)
+prediction_data <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data))
+
+# Add predictions to plot
+ggplot(
+  taiwan_real_estate, 
+  aes(n_convenience, sqrt(dist_to_mrt_m), color = price_twd_msq)
+) + 
+  geom_point() +
+  scale_color_viridis_c(option = "plasma")+
+  # Add prediction points colored yellow, size 3
+  geom_point( data = prediction_data, color='yellow', size =3)
+
+
+
+# Fit a linear regression of price vs. no. of conv. stores and sqrt dist. to nearest MRT, with interaction
+mdl_price_vs_conv_dist <- lm(formula = price_twd_msq ~ n_convenience * sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_conv_dist
+
+# From previous step 
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience * sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+# Create expanded grid of explanatory variables with no. of conv. stores and  dist. to nearest MRT
+explanatory_data <- expand_grid(
+  n_convenience = 0:10,
+  dist_to_mrt_m = seq(0, 80, 10) ^ 2
+)
+
+# Add predictions using mdl_price_vs_conv_dist and explanatory_data
+prediction_data <- explanatory_data %>% 
+  mutate(
+    price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data)
+  )
+
+# See the result
+prediction_data
+
+# From previous steps
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience * sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+explanatory_data <- expand_grid(n_convenience = 0:10, dist_to_mrt_m = seq(0, 80, 10) ^ 2)
+prediction_data <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data))
+
+# Add predictions to plot
+ggplot(
+  taiwan_real_estate, 
+  aes(n_convenience, sqrt(dist_to_mrt_m), color = price_twd_msq)
+) + 
+  geom_point() +
+  scale_color_viridis_c(option = "plasma") +
+  # Add prediction points colored yellow, size 3
+  geom_point(data = prediction_data, color = 'yellow', size =3)
+
+
+
+# Using taiwan_real_estate, no. of conv. stores vs. sqrt of dist. to MRT, colored by plot house price
+ggplot(taiwan_real_estate,  aes(sqrt(dist_to_mrt_m),n_convenience, color = price_twd_msq)) +
+  # Make it a scatter plot
+  geom_point() +
+  # Use the continuous viridis plasma color scale
+  scale_color_viridis_c(option ="plasma") +
+  # Facet, wrapped by house age
+  facet_wrap(vars(house_age_years))
+
+
+
+# Model price vs. no. of conv. stores, sqrt dist. to MRT station & house age, no global intercept, no interactions
+mdl_price_vs_all_no_inter <- lm(price_twd_msq ~ sqrt(dist_to_mrt_m) + n_convenience + house_age_years + 0, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_all_no_inter
+
+# Model price vs. sqrt dist. to MRT station, no. of conv. stores & house age, no global intercept, 3-way interactions
+mdl_price_vs_all_3_way_inter <- lm(  
+    price_twd_msq ~ sqrt(dist_to_mrt_m) + n_convenience + 
+    house_age_years + sqrt(dist_to_mrt_m):n_convenience +  sqrt(dist_to_mrt_m):house_age_years + n_convenience:house_age_years +
+    sqrt(dist_to_mrt_m):n_convenience:house_age_years +
+     0, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_all_3_way_inter
+
+# Model price vs. sqrt dist. to MRT station, no. of conv. stores & house age, no global intercept, 2-way interactions
+mdl_price_vs_all_2_way_inter <- lm(formula = price_twd_msq ~ sqrt(dist_to_mrt_m) + n_convenience + 
+    house_age_years + sqrt(dist_to_mrt_m):n_convenience + sqrt(dist_to_mrt_m):house_age_years + 
+    n_convenience:house_age_years + 
+    0, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_all_2_way_inter
+
+
+
+# Make a grid of explanatory data
+explanatory_data <- expand_grid(
+  # Set dist_to_mrt_m a seq from 0 to 80 by 10s, squared
+  dist_to_mrt_m = seq(0, 80, 10) ^ 2,
+  # Set n_convenience to 0 to 10
+  n_convenience = 0:10,
+  # Set house_age_years to the unique values of that variable
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# See the result
+explanatory_data
+
+# From previous step
+explanatory_data <- expand_grid(
+  dist_to_mrt_m = seq(0, 80, 10) ^ 2,
+  n_convenience = 0:10,
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# Add predictions to the data frame
+prediction_data <- explanatory_data %>% 
+  mutate(
+    price_twd_msq = predict(mdl_price_vs_all_3_way_inter, explanatory_data)
+  )
+
+# See the result
+prediction_data
+
+# From previous step
+explanatory_data <- expand_grid(
+  dist_to_mrt_m = seq(0, 80, 10) ^ 2,
+  n_convenience = 0:10,
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+prediction_data <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_price_vs_all_3_way_inter, explanatory_data))
+
+# Extend the plot
+ggplot(
+  taiwan_real_estate, 
+  aes(sqrt(dist_to_mrt_m), n_convenience, color = price_twd_msq)
+) +
+  geom_point() +
+  scale_color_viridis_c(option = "plasma") +
+  facet_wrap(vars(house_age_years)) +
+  # Add points from prediction data, size 3, shape 15
+  geom_point(data = prediction_data, size =3, shape =15)
+
+
+
+# Set the intercept to 10
+intercept <- 10
+
+# Set the slope to 1
+slope <- 1
+
+# Calculate the predicted y values
+y_pred <- intercept + slope * x_actual
+
+# Calculate the differences between actual and predicted
+y_diff <- y_actual - y_pred
+
+# Calculate the sum of squares
+sum(y_diff ^ 2)
+
+calc_sum_of_squares <- function(coeffs) {
+  # Get the intercept coeff
+  intercept <- coeffs[1]
+
+  # Get the slope coeff
+  slope <- coeffs[2]
+
+  # Calculate the predicted y values
+  y_pred <- intercept + slope * x_actual
+
+  # Calculate the differences between actual and predicted
+  y_diff <- y_actual - y_pred
+
+  # Calculate the sum of squares
+  sum(y_diff ^ 2)
+}
+
+# From previous step
+calc_sum_of_squares <- function(coeffs) {
+  intercept <- coeffs[1]
+  slope <- coeffs[2]
+  y_pred <- intercept + slope * x_actual
+  y_diff <- y_actual - y_pred
+  sum(y_diff ^ 2)
+}
+
+# Optimize the metric
+optim(
+  # Initially guess 0 intercept and 0 slope
+  par = c(intercept = 0, slope = 0), 
+  # Use calc_sum_of_squares as the optimization fn 
+  fn = calc_sum_of_squares
+)
+
+# Compare the coefficients to those calculated by lm()
+lm(price_twd_msq ~ n_convenience, data = taiwan_real_estate)
+
 #### 2.4 Multiple Logistic Regression
 
+# Using churn, plot recency vs. length of relationship colored by churn status
+ggplot(churn, aes(time_since_first_purchase,time_since_last_purchase,  color = has_churned)) +
+  # Make it a scatter plot, with transparency 0.5
+  geom_point(alpha = 0.5) +
+  # Use a 2-color gradient split at 0.5
+  scale_color_gradient2(midpoint =0.5) +
+  # Use the black and white theme
+  theme_bw()
+
+
+# Fit a logistic regression of churn status vs. length of relationship, recency, and an interaction
+mdl_churn_vs_both_inter <- glm(has_churned ~ time_since_first_purchase + time_since_last_purchase + time_since_first_purchase * time_since_last_purchase, data = churn, family = binomial)
+
+
+# See the result
+mdl_churn_vs_both_inter
+
+
+
+# Make a grid of explanatory data
+explanatory_data <- expand_grid(
+  # Set len. relationship to seq from -2 to 4 in steps of 0.1
+  time_since_first_purchase = seq(-2, 4, by= 0.1),
+  # Set recency to seq from -1 to 6 in steps of 0.1
+  time_since_last_purchase = seq(-1, 6, by= 0.1),
+)
+
+# See the result
+explanatory_data
+
+# From previous steps
+explanatory_data <- expand_grid(
+  time_since_first_purchase = seq(-2, 4, 0.1),
+  time_since_last_purchase = seq(-1, 6, 0.1)
+)
+
+# Add a column of predictions using mdl_churn_vs_both_inter and explanatory_data with type response
+prediction_data <- explanatory_data %>%  mutate(
+  has_churned = predict(mdl_churn_vs_both_inter, explanatory_data, type ="response")
+  )
+
+# See the result
+prediction_data
+
+# From previous steps
+explanatory_data <- expand_grid(
+  time_since_first_purchase = seq(-2, 4, 0.1),
+  time_since_last_purchase = seq(-1, 6, 0.1)
+)
+prediction_data <- explanatory_data %>% 
+  mutate(
+    has_churned = predict(mdl_churn_vs_both_inter, explanatory_data, type = "response")
+  )
+
+# Extend the plot
+ggplot(
+  churn, 
+  aes(time_since_first_purchase, time_since_last_purchase, color = has_churned)
+) +
+  geom_point(alpha = 0.5) +
+  scale_color_gradient2(midpoint = 0.5) +
+  theme_bw() +
+  # Add points from prediction_data with size 3 and shape 15
+  geom_point(data = prediction_data, size = 3, shape = 15)
+
+
+
+# Get the actual responses from churn
+actual_response <- churn$has_churned
+
+# Get the predicted responses from the model
+predicted_response <- round(fitted(mdl_churn_vs_both_inter))
+
+# Get a table of these values
+outcomes <- table(predicted_response, actual_response)
+
+# Convert the table to a conf_mat object
+confusion <- conf_mat(outcomes)
+
+# See the result
+confusion
+
+# From previous step
+actual_response <- churn$has_churned
+predicted_response <- round(fitted(mdl_churn_vs_both_inter))
+outcomes <- table(predicted_response, actual_response)
+confusion <- conf_mat(outcomes)
+
+# "Automatically" plot the confusion matrix
+autoplot(confusion)
+
+# Get summary metrics
+summary(confusion, event_level ="second")
+
+
+
+logistic_distn_cdf <- tibble(
+  # Make a seq from -10 to 10 in steps of 0.1
+  x = seq(-10, 10, 0.1),
+  # Transform x with built-in logistic CDF
+  logistic_x = plogis(x),
+  # Transform x with manual logistic
+  logistic_x_man = 1 / (1 + exp(-x))
+) 
+
+# Check that each logistic function gives the same results
+all.equal(
+  logistic_distn_cdf$logistic_x, 
+  logistic_distn_cdf$logistic_x_man
+)
+
+# From previous step
+logistic_distn_cdf <- tibble(
+  x = seq(-10, 10, 0.1),
+  logistic_x = plogis(x),
+  logistic_x_man = 1 / (1 + exp(-x))
+)
+
+# Using logistic_distn_cdf, plot logistic_x vs. x
+ggplot(logistic_distn_cdf, aes(x, logistic_x)) +
+  # Make it a line plot
+  geom_line()
+
+
+
+logistic_distn_inv_cdf <- tibble(
+  # Make a seq from 0.001 to 0.999 in steps of 0.001
+  p = seq(0.001, 0.999, 0.001),
+  # Transform with built-in logistic inverse CDF
+  logit_p = qlogis(p),
+  # Transform with manual logit
+  logit_p_man = log(p / (1 - p))
+) 
+
+# Check that each logistic function gives the same results
+all.equal(
+  logistic_distn_inv_cdf$logit_p,
+  logistic_distn_inv_cdf$logit_p_man
+)
+
+# From previous step
+logistic_distn_inv_cdf <- tibble(
+  p = seq(0.001, 0.999, 0.001),
+  logit_p = qlogis(p),
+  logit_p_man = log(p / (1 - p))
+)
+
+# Using logistic_distn_inv_cdf, plot logit_p vs. p
+ggplot(logistic_distn_inv_cdf, aes(p, logit_p)) +
+  # Make it a line plot
+  geom_line()
+
+
+# Look at the structure of binomial() function
+str(binomial())
+
+# Call the link inverse on x
+linkinv_x <- binomial()$linkinv(x)
+
+# Check linkinv_x and plogis() of x give same results 
+all.equal(linkinv_x, plogis(x))
+
+# Call the link fun on p
+linkfun_p <- binomial()$linkfun(p)
+
+# Check linkfun_p and qlogis() of p give same results  
+all.equal(linkfun_p, plogis(p))
+
+
+
+# Set the intercept to 1
+intercept <- 1
+
+# Set the slope to 0.5
+slope <- 0.5
+
+# Calculate the predicted y values
+y_pred <- plogis(intercept + slope * x_actual)
+
+# Calculate the log-likelihood for each term
+log_likelihoods <- log(y_pred) * y_actual + log(1 - y_pred) * (1 - y_actual)
+
+# Calculate minus the sum of the log-likelihoods for each term
+-sum(log_likelihoods)
+
+
+
+calc_neg_log_likelihood <- function(coeffs) {
+  # Get the intercept coeff
+  intercept <- coeffs[1]
+
+  # Get the slope coeff
+  slope <- coeffs[2]
+
+  # Calculate the predicted y values
+  y_pred <- plogis(intercept + slope * x_actual)
+
+  # Calculate the log-likelihood for each term
+  log_likelihoods <- log(y_pred) * y_actual + log(1 - y_pred) * (1 - y_actual)
+
+  # Calculate minus the sum of the log-likelihoods for each term
+  -sum(log_likelihoods)
+}
+
+
+# From previous step
+calc_neg_log_likelihood <- function(coeffs) {
+  intercept <- coeffs[1]
+  slope <- coeffs[2]
+  y_pred <- plogis(intercept + slope * x_actual)
+  log_likelihoods <- log(y_pred) * y_actual + log(1 - y_pred) * (1 - y_actual)
+  -sum(log_likelihoods)
+}
+
+# Optimize the metric
+optim(
+  # Initially guess 0 intercept and 1 slope
+  par = c(intercept = 0, slope = 1),
+  # Use calc_neg_log_likelihood as the optimization fn 
+  fn = calc_neg_log_likelihood
+)
+
+# Compare the coefficients to those calculated by glm()
+glm(has_churned ~ time_since_last_purchase, data = churn, family = binomial)
