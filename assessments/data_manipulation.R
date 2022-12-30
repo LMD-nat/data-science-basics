@@ -92,11 +92,4 @@ library(ggplot2)
 
 ggplot(wine, aes(`citric acid`, pH)) + 
   geom_point(alpha=0.3)
-  
  
- 
-
-  
-
-
-  
