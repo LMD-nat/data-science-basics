@@ -40,7 +40,7 @@ I organized code based on themes while weeding out repetition, because some cour
 3. `cleaning.R` includes basically all things designed to clean out a dataset. Record linkage, operations with dplyr and checking stuff (assert_is) is written here. 
 4. `do_eda.R` has all the steps from start to finish of an exploratory data analysis. 
 5. `dplyr.R` includes all the dplyr and plyr functions, and discusses the pipe operator in detail.
-6. `eda_case_study.R` is an example case study using the code from do_eda.R. 
+6. `eda_case_study.R` is an example case study using the code from `do_eda.R`. 
 7. `imports.R` has basically every import method for basically any type of dataset (.txt, .csv, sas datasets, etc.)
 8. `lubridate.R` has functions for working with dates and time series data. 
 9. `markdown.Rmd` describes how to write reports in MarkDown. 
