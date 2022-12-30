@@ -35,3 +35,7 @@ Assesments:
 1. Data Manipulation in R
 2. Importing and Cleaning Data in R
 3. R Programming
+
+Case study: 
+
+1. Moped case study
