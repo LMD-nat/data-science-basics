@@ -4,7 +4,7 @@
 
 I have included the code that I wrote, but not the datasets because they don't belong to me. Also I didn't write the case study, just the solutions and workflow. 
 
-** Courses on the syllabus: ** 
+**Courses on the syllabus:**
 
 I think the courses might have changed since I got the certification, so I've listed the courses here. Also because sometimes they become obsolete. 
 
@@ -31,7 +31,7 @@ I think the courses might have changed since I got the certification, so I've li
 21. Unsupervised Learning in R
 22. Cluster Analysis in R
 
-** Code organization ** 
+**Code organization** 
 
 I organized code based on themes while weeding out repetition, because some courses cover the same content. 
 
@@ -50,7 +50,7 @@ I organized code based on themes while weeding out repetition, because some cour
 13. `visualization.R` includes code with ggplot to visualize and plot all sorts of data. 
 14. `writing_functions.R` is all about writing code that serves a particular need or solves a particular problem, if a function that does the operation you are looking for doesn't already exist. It describes the syntax of functions and how to call them. 
 
-** Assesments: ** 
+**Assesments:** 
 
 1. Data Manipulation in R
 2. Importing and Cleaning Data in R
@@ -58,6 +58,6 @@ I organized code based on themes while weeding out repetition, because some cour
 
 These were the obligatory assessments, but I completed many more! 
 
-** Case study: **
+**Case study:**
 
 1. Moped case study (Jupyter notebook with R code snippets)
